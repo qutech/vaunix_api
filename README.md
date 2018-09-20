@@ -1,7 +1,7 @@
 # Vaunix API
 
 This is a small package to download and wrap the C library of LabBrick signal generators.
-It can be extended for other LabBrick devices.
+It can be extended for other LabBrick devices. This package is not affiliated with Vaunix Technology Corporation.
 
 ```
 pip install vaunix_api
