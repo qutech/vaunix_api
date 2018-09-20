@@ -15,9 +15,13 @@ from vaunix_api import VNXError
 __all__ = ['download_lsg_binaries', 'VNX_LSG_API', 'LSGStatus']
 
 
+def default_library_location():
+    return os.path.join(os.path.dirname(os.path.realpath(__file__)), 'vnx_fsynth')
+
+
 def download_lsg_binaries(target_path=None):
     if target_path is None:
-        target_path = os.path.dirname(os.path.realpath(__file__))
+        target_path = os.path.dirname(default_library_location())
 
     if os.name != 'nt' or platform.architecture()[0] != '64bit':
         raise RuntimeError('Only implemented for Windows x64 :(\n'
@@ -133,7 +137,16 @@ class VNX_LSG_API:
     DEVID = ctypes.c_uint
     DeviceIDArray: type = MAX_NUM_DEVICES * DEVID
 
-    def __init__(self, library: ctypes.CDLL):
+    @classmethod
+    def default(cls):
+        if cls._default is None:
+            cls._default = VNX_LSG_API()
+        return cls._default
+
+    def __init__(self, library: ctypes.CDLL=None):
+        if library is None:
+            library = ctypes.cdll.LoadLibrary(default_library_location())
+
         self._library = library
 
         self._library.fnLSG_SetTestMode.restype = None
