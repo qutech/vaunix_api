@@ -1,5 +1,4 @@
 import ctypes
-import re
 import urllib.request
 import tempfile
 import os
