@@ -251,11 +251,7 @@ class VNX_LSG_API:
             func_ptr.argtypes = (self.DEVID,)
             func_ptr.errcheck = self.parse_int_answer
 
-            py_name = to_snake_case(func_name[6:]).replace('__', '_')
-
-            setattr(self, py_name, func_ptr)
-
-    def set_test_mode(self, test_mode: bool):
+    def set_test_mode(self, test_mode: bool) -> None:
         self._library.fnLSG_SetTestMode(test_mode)
 
     def get_dll_version(self):
@@ -283,20 +279,141 @@ class VNX_LSG_API:
     def close_device(self, device_id: int) -> int:
         return self._library.fnLSG_CloseDevice(device_id)
 
+    def start_sweep(self, device_id: int, go: bool) -> int:
+        return self._library.fnLSG_StartSweep(device_id, go)
+
+    def save_settings(self, device_id: int) -> int:
+        return self._library.fnLSG_SaveSettings(device_id)
+
+    # get / set methods
     def set_frequency(self, device_id: int, frequency: int) -> int:
         return self._library.fnLSG_SetFrequency(device_id, frequency)
 
     def get_frequency(self, device_id: int) -> int:
         return self._library.fnLSG_GetFrequency(device_id)
 
-    def set_power_level(self, device_id, power_level: int):
+    def set_power_level(self, device_id: int, power_level: int) -> int:
         return self._library.fnLSG_SetPowerLevel(device_id, power_level)
 
     def get_power_level(self, device_id: int) -> int:
-        return self._library.fnLSG_GetPowerLevel(device_id)
+        # fnLSG_GetPowerLevel returns something strange
+        return self._library.fnLSG_GetPowerLevelAbs(device_id)
+
+    def set_rf_on(self, device_id: int, rf_on: bool) -> int:
+        return self._library.fnLSG_SetRFOn(device_id, rf_on)
+
+    def get_rf_on(self, device_id: int) -> bool:
+        return self._library.fnLSG_GetRF_On(device_id)
+
+    def set_start_frequency(self, device_id: int, start_frequency: int) -> int:
+        return self._library.fnLSG_SetStartFrequency(device_id, start_frequency)
+
+    def get_start_frequency(self, device_id: int) -> int:
+        return self._library.fnLSG_GetStartFrequency(device_id)
+
+    def set_end_frequency(self, device_id: int, end_frequency: int) -> int:
+        return self._library.fnLSG_SetEndFrequency(device_id, end_frequency)
+
+    def get_end_frequency(self, device_id: int) -> int:
+        return self._library.fnLSG_GetEndFrequency(device_id)
+
+    def set_frequency_step(self, device_id: int, frequency_step: int) -> int:
+        return self._library.fnLSG_SetFrequencyStep(device_id, frequency_step)
+
+    def get_frequency_step(self, device_id: int) -> int:
+        return self._library.fnLSG_GetFrequencyStep(device_id)
+
+    def set_dwell_time(self, device_id: int, dwell_time: int) -> int:
+        return self._library.fnLSG_SetDwellTime(device_id, dwell_time)
+
+    def get_dwell_time(self, device_id: int) -> int:
+        return self._library.fnLSG_GetDwellTime(device_id)
+
+    def set_use_internal_ref(self, device_id: int, use_internal: bool) -> int:
+        return self._library.fnLSG_SetUseInternalRef(device_id, use_internal)
+
+    def get_use_internal_ref(self, device_id: int) -> int:
+        return self._library.fnLSG_GetUseInternalRef(device_id)
+
+    # set only
+    def set_sweep_direction(self, device_id: int, sweep_direction: bool) -> int:
+        return self._library.fnLSG_SetSweepDirection(device_id, sweep_direction)
+
+    def set_sweep_mode(self, device_id: int, sweep_mode: bool) -> int:
+        return self._library.fnLSG_SetSweepMode(device_id, sweep_mode)
+
+    # get constants
+    def get_min_pwr(self, device_id: int) -> int:
+        return self._library.fnLSG_GetMinPwr(device_id)
+
+    def get_max_pwr(self, device_id: int) -> int:
+        return self._library.fnLSG_GetMaxPwr(device_id)
+
+    def get_min_freq(self, device_id: int) -> int:
+        return self._library.fnLSG_GetMinFreq(device_id)
+
+    def get_max_freq(self, device_id: int) -> int:
+        return self._library.fnLSG_GetMaxFreq(device_id)
+
+    def get_device_status(self, device_id: int) -> int:
+        return self._library.fnLSG_GetDeviceStatus(device_id)
 
     @classmethod
     def parse_int_answer(cls, answer, func, arguments):
-        if answer & cls.ERROR_BIT:
+        if answer <= ctypes.c_int(cls.DEVICE_NOT_READY).value:
             raise VNXError("Error executing %s" % func.__name__, answer, arguments)
         return answer
+
+
+def _test_get_set(really=False):
+    """Feel free to turn this into a real test"""
+
+    if not really:
+        raise RuntimeError('PLease make shure that your device is not connected to something important')
+
+    api = VNX_LSG_API.default()
+
+    api.set_test_mode(True)
+
+    assert api.get_num_devices() == 2
+
+    for device_id in api.get_dev_info():
+        print(api.get_serial_number(device_id),
+              api.get_model_name(device_id),
+              LSGStatus(api.get_device_status(device_id)))
+
+    for device_id in api.get_dev_info():
+        for name, attr in inspect.getmembers(api):
+            if inspect.ismethod(attr) and name.startswith('get_'):
+                if inspect.getfullargspec(attr).annotations == {'return': int, 'device_id': int}:
+                    old_value = attr(device_id)
+                    assert isinstance(old_value, int), "%s no int" % name
+                    print('tested', name, old_value)
+
+                    set_name = name.replace('get_', 'set_')
+                    if set_name in dir(api):
+                        setter = getattr(api, set_name)
+                        annotations = inspect.getfullargspec(setter).annotations.copy()
+                        del annotations['return']
+                        del annotations['device_id']
+
+                        set_type = next(iter(annotations.values()))
+
+                        if set_type is int:
+                            if old_value < 10:
+                                new_value = old_value + 2
+                            else:
+                                new_value = old_value - 2
+                        else:
+                            new_value = not old_value
+
+                        try:
+                            setter(device_id, new_value)
+                        except VNXError as err:
+                            if err.args[1] == ctypes.c_int(api.BAD_PARAMETER).value:
+                                print('tested', set_name, 'with range error')
+                            else:
+                                raise
+                        else:
+                            assert new_value == attr(device_id), "%r != %r" % (new_value, attr(device_id))
+                            print('tested', set_name)
