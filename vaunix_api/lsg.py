@@ -150,16 +150,13 @@ class VNX_LSG_API:
         self._library = library
 
         self._library.fnLSG_SetTestMode.restype = None
-        self._library.fnLSG_SetTestMode.argtypes = (bool,)
-        self._library.fnLSG_SetTestMode.errcheck = None
+        self._library.fnLSG_SetTestMode.argtypes = (ctypes.c_bool,)
 
-        self._library.fnLSG_GetNumDevices.restype = None
+        self._library.fnLSG_GetNumDevices.restype = int
         self._library.fnLSG_GetNumDevices.argtypes = ()
-        self._library.fnLSG_GetNumDevices.errcheck = None
 
         self._library.fnLSG_GetDevInfo.restype = int
         self._library.fnLSG_GetDevInfo.argtypes = (self.DeviceIDArray,)
-        self._library.fnLSG_GetDevInfo.errcheck = None
 
         if os.name == 'nt':
             self._get_model_name_char = self._library.fnLSG_GetModelNameA
@@ -177,101 +174,76 @@ class VNX_LSG_API:
         self._library.fnLSG_CloseDevice.argtypes = (self.DEVID,)
         self._library.fnLSG_CloseDevice.errcheck = self.parse_int_answer
 
-        self._library.fnLSG_GetSerialNumber.restype = int
-        self._library.fnLSG_GetSerialNumber.argtypes = (self.DEVID,)
-        self._library.fnLSG_GetSerialNumber.errcheck = self.parse_int_answer
-
         self._library.fnLSG_GetDLLVersion.restype = int
         self._library.fnLSG_GetDLLVersion.argtypes = ()
         self._library.fnLSG_GetDLLVersion.errcheck = self.parse_int_answer
 
         self._library.fnLSG_SetFrequency.restype = int
-        self._library.fnLSG_SetFrequency.argtypes = (self.DEVID, int)
+        self._library.fnLSG_SetFrequency.argtypes = (self.DEVID, ctypes.c_int)
         self._library.fnLSG_SetFrequency.errcheck = self.parse_int_answer
 
         self._library.fnLSG_SetStartFrequency.restype = int
-        self._library.fnLSG_SetStartFrequency.argtypes = (self.DEVID, int)
+        self._library.fnLSG_SetStartFrequency.argtypes = (self.DEVID, ctypes.c_int)
         self._library.fnLSG_SetStartFrequency.errcheck = self.parse_int_answer
-        self.set_start_frequency = self._library.fnLSG_SetStartFrequency
 
         self._library.fnLSG_SetEndFrequency.restype = int
-        self._library.fnLSG_SetEndFrequency.argtypes = (self.DEVID, int)
+        self._library.fnLSG_SetEndFrequency.argtypes = (self.DEVID, ctypes.c_int)
         self._library.fnLSG_SetEndFrequency.errcheck = self.parse_int_answer
-        self.set_end_frequency = self._library.fnLSG_SetEndFrequency
 
         self._library.fnLSG_SetFrequencyStep.restype = int
-        self._library.fnLSG_SetFrequencyStep.argtypes = (self.DEVID, int)
+        self._library.fnLSG_SetFrequencyStep.argtypes = (self.DEVID, ctypes.c_int)
         self._library.fnLSG_SetFrequencyStep.errcheck = self.parse_int_answer
-        self.set_frequency_step = self._library.fnLSG_SetFrequencyStep
 
         self._library.fnLSG_SetDwellTime.restype = int
-        self._library.fnLSG_SetDwellTime.argtypes = (self.DEVID, int)
+        self._library.fnLSG_SetDwellTime.argtypes = (self.DEVID, ctypes.c_int)
         self._library.fnLSG_SetDwellTime.errcheck = self.parse_int_answer
-        self.set_dwell_time = self._library.fnLSG_SetDwellTime
 
         self._library.fnLSG_SetPowerLevel.restype = int
-        self._library.fnLSG_SetPowerLevel.argtypes = (self.DEVID, int)
+        self._library.fnLSG_SetPowerLevel.argtypes = (self.DEVID, ctypes.c_int)
         self._library.fnLSG_SetPowerLevel.errcheck = self.parse_int_answer
-        self.set_power_level = self._library.fnLSG_SetPowerLevel
 
         self._library.fnLSG_SetRFOn.restype = int
-        self._library.fnLSG_SetRFOn.argtypes = (self.DEVID, bool)
+        self._library.fnLSG_SetRFOn.argtypes = (self.DEVID, ctypes.c_bool)
         self._library.fnLSG_SetRFOn.errcheck = self.parse_int_answer
-        self.set_rf_on = self._library.fnLSG_SetRFOn
 
         self._library.fnLSG_SetUseInternalRef.restype = int
-        self._library.fnLSG_SetUseInternalRef.argtypes = (self.DEVID, bool)
+        self._library.fnLSG_SetUseInternalRef.argtypes = (self.DEVID, ctypes.c_bool)
         self._library.fnLSG_SetUseInternalRef.errcheck = self.parse_int_answer
-        self.set_use_internal_ref = self._library.fnLSG_SetUseInternalRef
 
         self._library.fnLSG_SetSweepDirection.restype = int
-        self._library.fnLSG_SetSweepDirection.argtypes = (self.DEVID, bool)
+        self._library.fnLSG_SetSweepDirection.argtypes = (self.DEVID, ctypes.c_bool)
         self._library.fnLSG_SetSweepDirection.errcheck = self.parse_int_answer
-        self.set_sweep_direction = self._library.fnLSG_SetSweepDirection
 
         self._library.fnLSG_SetSweepMode.restype = int
-        self._library.fnLSG_SetSweepMode.argtypes = (self.DEVID, bool)
+        self._library.fnLSG_SetSweepMode.argtypes = (self.DEVID, ctypes.c_bool)
         self._library.fnLSG_SetSweepMode.errcheck = self.parse_int_answer
-        self.set_sweep_mode = self._library.fnLSG_SetSweepMode
 
         self._library.fnLSG_StartSweep.restype = int
-        self._library.fnLSG_StartSweep.argtypes = (self.DEVID, bool)
+        self._library.fnLSG_StartSweep.argtypes = (self.DEVID, ctypes.c_bool)
         self._library.fnLSG_StartSweep.errcheck = self.parse_int_answer
-        self.start_sweep = self._library.fnLSG_StartSweep
 
         self._library.fnLSG_SaveSettings.restype = int
         self._library.fnLSG_SaveSettings.argtypes = (self.DEVID,)
         self._library.fnLSG_SaveSettings.errcheck = self.parse_int_answer
-        self.save_settings = self._library.fnLSG_SaveSettings
 
-        # get functions
-        self._library.fnLSG_GetFrequency.restype = int
-        self._library.fnLSG_GetFrequency.argtypes = (self.DEVID,)
-        self._library.fnLSG_GetFrequency.errcheck = self.parse_int_answer
-        self.get_frequency = self._library.fnLSG_GetFrequency
-
-        self._library.fnLSG_GetPowerLevel.restype = int
-        self._library.fnLSG_GetPowerLevel.argtypes = (self.DEVID,)
-        self._library.fnLSG_GetPowerLevel.errcheck = self.parse_int_answer
-        self.get_power_level = self._library.fnLSG_GetPowerLevel
-
-        get_functions = [
+        get_functions = ['fnLSG_GetSerialNumber',
+                         'fnLSG_GetFrequency',
+                         'fnLSG_GetPowerLevel',
                          'fnLSG_GetStartFrequency',
                          'fnLSG_GetEndFrequency',
                          'fnLSG_GetDwellTime',
                          'fnLSG_GetFrequencyStep',
-
                          'fnLSG_GetRF_On',
                          'fnLSG_GetUseInternalRef',
                          'fnLSG_GetPowerLevelAbs',
                          'fnLSG_GetMaxPwr',
                          'fnLSG_GetMinPwr',
                          'fnLSG_GetMaxFreq',
-                         'fnLSG_GetMinFreq', ]
-        py_name_reg = re.compile(r'(.+?)([A-Z])')
+                         'fnLSG_GetMinFreq']
 
-        def to_snake_case(name):
-            return py_name_reg.sub(lambda match: match.group(1).lower() + "_" + match.group(2).lower(), name, 0)
+        # no return check
+        self._library.fnLSG_GetDeviceStatus.restype = int
+        self._library.fnLSG_GetDeviceStatus.argtypes = (self.DEVID,)
 
         for func_name in get_functions:
             func_ptr = getattr(self._library, func_name)
