@@ -7,11 +7,12 @@ import zipfile
 import platform
 import shutil
 import logging
-from typing import List
+import inspect
+from typing import List, Dict
 
 from vaunix_api import VNXError
 
-__all__ = ['download_lsg_binaries', 'VNX_LSG_API']
+__all__ = ['download_lsg_binaries', 'VNX_LSG_API', 'LSGStatus']
 
 
 def download_lsg_binaries(target_path=None):
@@ -56,6 +57,48 @@ def download_lsg_binaries(target_path=None):
 
         logging.getLogger('vaunix_api').info('Moving to target location')
         shutil.move(extracted_dll_location, target_path)
+
+
+class LSGStatus:
+    """Helper class for inspecting answer of get_device_status"""
+    def __init__(self, raw_status: int):
+        self._raw_status = raw_status
+
+    def is_invalid(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.INVALID_DEVID)
+
+    def is_connected(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.DEV_CONNECTED)
+
+    def is_open(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.DEV_OPENED)
+
+    def is_sweeping(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.SWP_ACTIVE)
+
+    def is_sweeping_up(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.SWP_UP)
+
+    def is_repeating_sweep(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.SWP_REPEAT)
+
+    def is_sweeping_bidirectional(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.SWP_BIDIRECTIONAL)
+
+    def is_pll_locked(self) -> bool:
+        return bool(self._raw_status & VNX_LSG_API.PLL_LOCKED)
+
+    def as_dict(self) -> Dict[str, bool]:
+        state_methods = [method for method in dir(self) if method.startswith('is_')]
+
+        return {method: getattr(self, method)()
+                for method in state_methods}
+
+    def __repr__(self):
+        # only show True flags
+        return 'LSGState(%r)' % {key: value
+                                 for key, value in self.as_dict().items()
+                                 if value}
 
 
 class VNX_LSG_API:
