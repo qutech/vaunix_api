@@ -7,7 +7,8 @@ It can be extended for other LabBrick devices.
 pip install vaunix_api
 ```
 
-The required binaries can be downloaded via `vaunix_api.lsg.download_lsg_binaries()`.
+The required binaries can be downloaded via `vaunix_api.lsg.download_lsg_binaries()` from
+[vaunix website](https://vaunix.com/).
 
 Example:
 ```python

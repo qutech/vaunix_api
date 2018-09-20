@@ -25,7 +25,6 @@ def init_file_content():
 setup(name='vaunix_api',
       version=extract_version(init_file_content()),
       use_2to3=False,
-
       maintainer='Simon Humpohl',
       maintainer_email='simon.humpohl@rwth-aachen.de',
       description='Wrapper around VNX API to control signal generators, attenuators etc by vaunix',
@@ -41,6 +40,7 @@ setup(name='vaunix_api',
       license='GPL',
       packages=find_packages(),
       install_requires=[],
+      keywords=['vaunix', 'labbrick'],
 
       # Package can download dll by vaunix and needs a directory for that
       zip_safe=False)
