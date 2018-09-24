@@ -108,6 +108,8 @@ class VNX_LSG_API:
     """Wrapper for LabBroick Signal Generator API.
     All methods are explicit members for static type checking"""
 
+    _default = None
+
     MAX_NUM_DEVICES = 64
     MAX_MODELNAME = 32
 
