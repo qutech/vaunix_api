@@ -29,6 +29,7 @@ setup(name='vaunix_api',
       maintainer_email='simon.humpohl@rwth-aachen.de',
       description='Wrapper around VNX API to control signal generators, attenuators etc by vaunix',
       long_description=readme(),
+      long_description_content_type='text/markdown',
       url='https://github.com/qutech/vaunix_api',
       classifiers=[
           'Development Status :: 3 - Alpha',
