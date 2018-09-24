@@ -255,7 +255,7 @@ class VNX_LSG_API:
     def set_test_mode(self, test_mode: bool) -> None:
         self._library.fnLSG_SetTestMode(test_mode)
 
-    def get_dll_version(self):
+    def get_dll_version(self) -> int:
         return self._library.fnLSG_GetDLLVersion()
 
     def get_num_devices(self) -> int:
@@ -303,7 +303,7 @@ class VNX_LSG_API:
     def set_rf_on(self, device_id: int, rf_on: bool) -> int:
         return self._library.fnLSG_SetRFOn(device_id, rf_on)
 
-    def get_rf_on(self, device_id: int) -> bool:
+    def get_rf_on(self, device_id: int) -> int:
         return self._library.fnLSG_GetRF_On(device_id)
 
     def set_start_frequency(self, device_id: int, start_frequency: int) -> int:
@@ -360,7 +360,7 @@ class VNX_LSG_API:
         return self._library.fnLSG_GetDeviceStatus(device_id)
 
     @classmethod
-    def parse_int_answer(cls, answer, func, arguments):
+    def parse_int_answer(cls, answer: int, func, arguments) -> int:
         if answer <= ctypes.c_int(cls.DEVICE_NOT_READY).value:
             raise VNXError("Error executing %s" % func.__name__, answer, arguments)
         return answer
